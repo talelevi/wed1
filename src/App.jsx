@@ -14,6 +14,7 @@ import {
   buildShareUrl,
 } from './lib/state';
 import { THEMES } from './lib/themes';
+import { useInstallPrompt, useOnlineStatus } from './lib/pwa';
 
 const TAGLINES = [
   'בליל אחד, מתחת לאותו ירח, חיינו נחשפים',
@@ -27,8 +28,16 @@ export default function App() {
   const [state, setState] = useState(() => {
     return readStateFromUrl() || loadFromStorage() || DEFAULT_STATE;
   });
-  const [mode, setMode] = useState('builder'); // builder | invitation | guest
+  const initialMode = (() => {
+    if (typeof window === 'undefined') return 'builder';
+    const v = new URLSearchParams(window.location.search).get('view');
+    if (v === 'invitation' || v === 'guest' || v === 'builder') return v;
+    return 'builder';
+  })();
+  const [mode, setMode] = useState(initialMode); // builder | invitation | guest
   const [intro, setIntro] = useState(true);
+  const { canInstall, installed, promptInstall } = useInstallPrompt();
+  const online = useOnlineStatus();
 
   // Persist + sync URL hash on every change.
   useEffect(() => {
@@ -111,12 +120,27 @@ export default function App() {
             <div className="text-[10px] tracking-[0.3em] text-gold-50/60">בילדר הזמנות קוסמי</div>
           </div>
         </div>
-        <nav className="flex gap-1.5">
+        <nav className="flex gap-1.5 items-center">
+          {canInstall && !installed && (
+            <button
+              onClick={promptInstall}
+              className="hidden sm:inline-flex text-[11px] tracking-widest rounded-lg px-2.5 py-1.5 border border-gold-300/60 text-gold-50 hover:bg-white/10"
+              title="התקנה כאפליקציה"
+            >
+              ⤓ התקנה
+            </button>
+          )}
           <TabBtn active={mode === 'builder'} onClick={() => setMode('builder')}>בילדר</TabBtn>
           <TabBtn active={mode === 'invitation'} onClick={() => setMode('invitation')}>תצוגה מלאה</TabBtn>
           <TabBtn active={mode === 'guest'} onClick={() => setMode('guest')}>חוויית אורח</TabBtn>
         </nav>
       </header>
+
+      {!online && (
+        <div className="relative z-20 text-center text-xs py-1.5 bg-amber-300/15 border-y border-amber-300/30 text-amber-100">
+          ⚠ אין חיבור לאינטרנט · ההזמנה ממשיכה לעבוד אופליין, אישורי הגעה יישלחו ברגע שהחיבור יחזור
+        </div>
+      )}
 
       <main className="relative z-10 min-h-[calc(100vh-60px)]">
         {mode === 'builder' && (

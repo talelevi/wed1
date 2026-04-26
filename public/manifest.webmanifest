@@ -1,0 +1,33 @@
+{
+  "name": "Luminara — Invitations Not Of This World",
+  "short_name": "Luminara",
+  "description": "בילדר חי להזמנות חתונה וחינה — דינמי, קוסמי, עם קישור ליומן ושיתוף קסום.",
+  "lang": "he",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0612",
+  "theme_color": "#0a0612",
+  "icons": [
+    { "src": "./favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any maskable" }
+  ],
+  "categories": ["lifestyle", "social", "productivity"],
+  "shortcuts": [
+    {
+      "name": "תצוגת הזמנה",
+      "short_name": "הזמנה",
+      "description": "פתיחת ההזמנה במסך מלא",
+      "url": "./?view=invitation",
+      "icons": [{ "src": "./favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "אישור הגעה",
+      "short_name": "RSVP",
+      "description": "מילוי אישור הגעה",
+      "url": "./?view=guest",
+      "icons": [{ "src": "./favicon.svg", "sizes": "any" }]
+    }
+  ]
+}

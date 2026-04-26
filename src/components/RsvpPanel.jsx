@@ -1,43 +1,43 @@
 import React, { useState } from 'react';
+import { addRsvp, clearRsvps, isCloud, useRsvps } from '../lib/rsvp';
 
-// Local-first RSVP recorder. Saves responses to localStorage and offers a CSV export.
-// (No backend required – pair with a real form service when shipped.)
+// RSVP recorder. Uses Supabase if configured, otherwise localStorage.
+// Behavior is identical for guests; only the storage backend differs.
 export default function RsvpPanel({ state }) {
+  const { rows, loading, refresh } = useRsvps();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [count, setCount] = useState(2);
   const [attending, setAttending] = useState('yes');
   const [note, setNote] = useState('');
   const [done, setDone] = useState(false);
-  const [list, setList] = useState(() => readList());
+  const [busy, setBusy] = useState(false);
+  const cloud = isCloud();
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
-    const entry = {
-      id: Date.now(),
-      name: name.trim(),
-      phone: phone.trim(),
-      count,
-      attending,
-      note: note.trim(),
-      ts: new Date().toISOString(),
-    };
-    if (!entry.name) return;
-    const next = [entry, ...list];
-    setList(next);
-    localStorage.setItem('luminara:rsvp', JSON.stringify(next));
-    setDone(true);
-    setName(''); setPhone(''); setCount(2); setAttending('yes'); setNote('');
-    setTimeout(() => setDone(false), 2200);
+    if (!name.trim() || busy) return;
+    setBusy(true);
+    try {
+      await addRsvp({ name, phone, count, attending, note });
+      await refresh();
+      setDone(true);
+      setName(''); setPhone(''); setCount(2); setAttending('yes'); setNote('');
+      setTimeout(() => setDone(false), 2200);
+    } catch (err) {
+      alert(err?.message || 'שמירה נכשלה');
+    } finally {
+      setBusy(false);
+    }
   };
 
   const exportCsv = () => {
-    const rows = [
+    const r = [
       ['name', 'phone', 'count', 'attending', 'note', 'ts'],
-      ...list.map((r) => [r.name, r.phone, r.count, r.attending, r.note, r.ts]),
+      ...rows.map((x) => [x.name, x.phone, x.count, x.attending, x.note, x.ts]),
     ];
-    const csv = rows
-      .map((r) => r.map((c) => `"${String(c ?? '').replace(/"/g, '""')}"`).join(','))
+    const csv = r
+      .map((row) => row.map((c) => `"${String(c ?? '').replace(/"/g, '""')}"`).join(','))
       .join('\n');
     const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -50,19 +50,21 @@ export default function RsvpPanel({ state }) {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
-  const clearAll = () => {
-    if (!confirm('למחוק את כל ההרשמות מההתקן הזה?')) return;
-    localStorage.removeItem('luminara:rsvp');
-    setList([]);
+  const clearLocal = async () => {
+    if (!confirm('למחוק את ההרשמות (מהמכשיר הזה בלבד)?')) return;
+    await clearRsvps();
+    refresh();
   };
 
-  const totalYes = list.filter((r) => r.attending === 'yes').reduce((acc, r) => acc + Number(r.count || 0), 0);
+  const totalYes = rows.filter((r) => r.attending === 'yes').reduce((acc, r) => acc + Number(r.count || 0), 0);
 
   return (
     <div className="glass-strong rounded-2xl p-4 sm:p-5">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold tracking-wide">אישורי הגעה</h3>
-        <span className="text-[11px] text-gold-50/60">נשמר בדפדפן · ייצוא CSV</span>
+        <span className="text-[11px] text-gold-50/60">
+          {cloud ? '☁️ ענן (Supabase) · עדכון חי' : '📱 שמירה מקומית בדפדפן'}
+        </span>
       </div>
 
       <form onSubmit={submit} className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -90,24 +92,26 @@ export default function RsvpPanel({ state }) {
         />
         <div className="sm:col-span-2 flex flex-wrap gap-2 justify-end">
           {done && <span className="text-sm text-emerald-300 self-center">נרשם בתודה ✨</span>}
-          <button className="btn btn-primary" type="submit">שליחת אישור</button>
+          <button className="btn btn-primary" type="submit" disabled={busy}>
+            {busy ? 'שולח…' : 'שליחת אישור'}
+          </button>
         </div>
       </form>
 
       <div className="mt-4 flex items-center justify-between text-sm">
         <div>
-          סה"כ נרשמו: <b>{list.length}</b>{' '}
+          סה"כ נרשמו: <b>{loading ? '…' : rows.length}</b>{' '}
           <span className="text-gold-50/60">· מגיעים: <b className="text-emerald-300">{totalYes}</b></span>
         </div>
         <div className="flex gap-2">
-          <button className="btn btn-ghost" onClick={exportCsv} disabled={!list.length}>⬇ CSV</button>
-          <button className="btn btn-ghost" onClick={clearAll} disabled={!list.length}>נקה</button>
+          <button className="btn btn-ghost" onClick={exportCsv} disabled={!rows.length}>⬇ CSV</button>
+          <button className="btn btn-ghost" onClick={clearLocal} disabled={!rows.length}>נקה</button>
         </div>
       </div>
 
-      {!!list.length && (
+      {!!rows.length && (
         <div className="mt-3 max-h-40 overflow-auto no-scrollbar text-xs space-y-1">
-          {list.slice(0, 30).map((r) => (
+          {rows.slice(0, 30).map((r) => (
             <div key={r.id} className="flex justify-between gap-2 border-b border-white/5 py-1">
               <span>{r.name} ({r.count})</span>
               <span className={r.attending === 'yes' ? 'text-emerald-300' : r.attending === 'no' ? 'text-rose-300' : 'text-amber-200'}>
@@ -119,12 +123,4 @@ export default function RsvpPanel({ state }) {
       )}
     </div>
   );
-}
-
-function readList() {
-  try {
-    return JSON.parse(localStorage.getItem('luminara:rsvp') || '[]');
-  } catch {
-    return [];
-  }
 }

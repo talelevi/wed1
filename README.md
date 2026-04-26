@@ -34,13 +34,56 @@ npm run preview    # שירות מקומי לבדיקה של ה-build
 
 ## ✦ פריסה (Deploy)
 
-האפליקציה היא 100% סטטית אחרי `npm run build` ולכן מתאימה ל:
-- **Vercel** / **Netlify** / **Cloudflare Pages** – חברו את הריפו, הם יזהו `vite` אוטומטית.
-- **GitHub Pages** – העלו את התיקייה `dist/` לסניף `gh-pages`.
-- **Firebase Hosting** / **S3 + CloudFront**.
+האפליקציה היא 100% סטטית אחרי `npm run build`. הריפו מגיע עם הגדרות מוכנות:
 
-> אין שרת. הכל רץ בדפדפן. ה-state של ההזמנה נשמר ב-URL Hash (`#inv=...`) כך
-> שכל קישור ששלחת מכיל את ההזמנה כולה.
+| יעד            | קובץ                          | פעולה                                                          |
+| -------------- | ----------------------------- | -------------------------------------------------------------- |
+| **Vercel**     | `vercel.json`                 | "Import Project" → זה מזהה Vite אוטומטית, deploy בקליק.       |
+| **Netlify**    | `netlify.toml`                | "Add new site → from Git", הקונפיג מגדיר build/publish/headers. |
+| **GitHub Pages** | `.github/workflows/pages.yml` | Push ל-`main` → builds & deploys. הפעילו Pages במצב "GitHub Actions". |
+| **Cloudflare Pages** / **Firebase Hosting** | (ללא קונפיג) | Build = `npm run build`, output dir = `dist`.       |
+
+> אין שרת. ה-state של ההזמנה נשמר ב-URL Hash (`#inv=...`) כך שכל קישור ששלחת מכיל את ההזמנה כולה.
+
+### Environment Variables (אופציונלי)
+
+```bash
+cp .env.example .env.local
+```
+
+| Variable                    | מטרה                                                  |
+| --------------------------- | ---------------------------------------------------- |
+| `VITE_SUPABASE_URL`         | URL של פרויקט ה-Supabase (לאחסון RSVP בענן)         |
+| `VITE_SUPABASE_ANON_KEY`    | מפתח public anon                                     |
+| `VITE_DEFAULT_EVENT_ID`     | מזהה האירוע (`dana-omer-2026` למשל)                  |
+
+ב-Vercel/Netlify הוסיפו אותם תחת Project → Environment Variables.
+ב-GitHub Actions: Repository → Settings → Secrets and variables → Actions.
+
+## ✦ PWA (התקנה כאפליקציה)
+
+- ✓ מניפסט מלא בעברית (`public/manifest.webmanifest`) עם shortcuts לתצוגת הזמנה ול-RSVP.
+- ✓ Service Worker (`public/sw.js`): network-first ל-HTML, stale-while-revalidate לאסטים ולגופנים, אופליין-shell.
+- ✓ זיהוי `beforeinstallprompt` והופעת כפתור "⤓ התקנה" בכותרת.
+- ✓ באנר אופליין שמתריע כשהחיבור נופל.
+- ✓ תמיכה ב-iOS דרך `apple-mobile-web-app-*` meta tags.
+
+> בפיתוח (`npm run dev`) ה-SW לא נרשם — רק על הדומיין הסופי.
+
+## ✦ אחסון RSVP בענן (Supabase)
+
+מודול ה-RSVP מזהה אוטומטית אם יש משתני סביבה של Supabase:
+
+- **יש env** → קריאה/כתיבה לטבלת `rsvps` עם **עדכון בזמן אמת** (Realtime channel).
+- **אין env** → נופל ל-localStorage. החוויה זהה למשתמש; הנתונים פשוט לא משתפים בין מכשירים.
+
+הסכמה והפוליסות המלאות נמצאות ב-[`supabase/schema.sql`](supabase/schema.sql).
+הריצו אותה פעם אחת ב-Supabase SQL Editor ותקבלו:
+
+- טבלת `rsvps` חדשה
+- אינדקס לפי `event_id + created_at`
+- RLS פעיל עם פוליסות שמרשות `INSERT` ו-`SELECT` ל-`anon`
+- (אופציונלי) הפעילו Realtime על הטבלה לקבלת עדכונים חיים בפאנל
 
 ## ✦ מבנה הפרויקט
 
@@ -89,12 +132,14 @@ https://your-domain.example/#inv=<token>
 
 ## ✦ מפת דרכים
 
-- [ ] שמירת ההזמנות בענן (Supabase / Firebase) עם ID קצר במקום Hash ארוך.
-- [ ] גלריית תמונות / סרטון רקע בכרטיס.
-- [ ] עוד נושאים: "Botanical", "Mediterranean", "Glassmorphism Day".
-- [ ] תרגום אנגלית/ערבית/רוסית.
-- [ ] PWA + שמירה לאופליין.
-- [ ] שילוב WhatsApp Business API לשליחה אוטומטית לרשימת מוזמנים.
+- [x] PWA + שמירה לאופליין
+- [x] אחסון RSVP בענן (Supabase) עם fallback ל-localStorage
+- [x] קונפיגי deploy ל-Vercel / Netlify / GitHub Pages
+- [ ] שמירת ההזמנות בענן עם ID קצר (במקום Hash ארוך) ושיתוף קצר
+- [ ] גלריית תמונות / סרטון רקע בכרטיס
+- [ ] עוד נושאים: "Botanical", "Mediterranean", "Glassmorphism Day"
+- [ ] תרגום אנגלית/ערבית/רוסית
+- [ ] שילוב WhatsApp Business API לשליחה אוטומטית לרשימת מוזמנים
 
 ## ✦ תרומה
 
