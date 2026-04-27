@@ -13,16 +13,22 @@ every change is reflected instantly in the preview.
 
 ## 🚀 פריסה מהירה — 30 שניות
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftalelevi%2Fwed1&project-name=luminara&repository-name=luminara)
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/talelevi/wed1)
+הריפו מוכן לחלוטין: `vercel.json` כבר כאן, יש default branch (`main`), הבנייה נוקייה (113KB gzip).
+כל מה שנותר זה לחבר את החשבון שלכם ב-Vercel.
 
-**Vercel — הדרך המהירה ביותר לראות את זה בטלפון:**
+**מהטלפון, צעד-אחר-צעד:**
 
-1. לחצו על הכפתור הסגול־לבן למעלה ("Deploy with Vercel"), או היכנסו ל-[vercel.com/new](https://vercel.com/new) מהטלפון
-2. התחברו עם חשבון ה-GitHub שלכם (פעם אחת)
-3. אם השתמשתם בכפתור — Vercel מזהה את ה-`vercel.json` ואת Vite אוטומטית. רק לוחצים "Deploy"
-4. אחרי 30–60 שניות מקבלים URL בסגנון `luminara-xxx.vercel.app` — פותחים בטלפון, מוסיפים למסך הבית (PWA מוכן)
-5. כל push לברנץ' יוצר automatic preview URL — ככה תוכלו לראות שינויים בלי merge
+1. פתחו [**vercel.com/new**](https://vercel.com/new) בדפדפן בטלפון
+2. **Continue with GitHub** והתחברו לחשבון `talelevi` (פעם אחת בלבד)
+3. בחרו את הריפו `talelevi/wed1` מהרשימה ולחצו **Import**
+4. Vercel מזהה אוטומטית: Framework = *Vite*, Build = `npm run build`, Output = `dist`. אל תשנו כלום — רק לחצו **Deploy**
+5. אחרי 30-60 שניות תקבלו URL כמו `luminara-talelevi.vercel.app`
+6. פותחים את ה-URL בטלפון → הדפדפן יציע "Add to Home Screen" (PWA מוכן) — קיצור עם אייקון על מסך הבית
+
+**Production branch:** `main` (כבר קיים).
+**Preview URL לכל push:** Vercel ייתן URL נפרד לכל ברנץ' — תוכלו לבדוק שינויים בלי merge.
+
+**גיבוי — Netlify:** [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/talelevi/wed1)
 
 **הגדרות Build (אם יישאלו):**
 | | |
