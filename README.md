@@ -11,6 +11,35 @@ every change is reflected instantly in the preview.
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![stack](https://img.shields.io/badge/stack-React%20%2B%20Vite%20%2B%20Tailwind-0ea5e9)
 
+## 🚀 פריסה מהירה — 30 שניות
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftalelevi%2Fwed1&project-name=luminara&repository-name=luminara)
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/talelevi/wed1)
+
+**Vercel — הדרך המהירה ביותר לראות את זה בטלפון:**
+
+1. לחצו על הכפתור הסגול־לבן למעלה ("Deploy with Vercel"), או היכנסו ל-[vercel.com/new](https://vercel.com/new) מהטלפון
+2. התחברו עם חשבון ה-GitHub שלכם (פעם אחת)
+3. אם השתמשתם בכפתור — Vercel מזהה את ה-`vercel.json` ואת Vite אוטומטית. רק לוחצים "Deploy"
+4. אחרי 30–60 שניות מקבלים URL בסגנון `luminara-xxx.vercel.app` — פותחים בטלפון, מוסיפים למסך הבית (PWA מוכן)
+5. כל push לברנץ' יוצר automatic preview URL — ככה תוכלו לראות שינויים בלי merge
+
+**הגדרות Build (אם יישאלו):**
+| | |
+|---|---|
+| Framework Preset | Vite |
+| Build Command | `npm run build` |
+| Output Directory | `dist` |
+| Install Command | `npm install` |
+
+**Environment Variables (לא חובה):**
+אם תרצו אחסון RSVP בענן, הוסיפו ב-Project → Settings → Environment Variables:
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+- `VITE_DEFAULT_EVENT_ID` (לדוגמה: `tal-event-2026`)
+
+> 💡 בלי משתני סביבה — RSVP נשמר ב-localStorage של הטלפון. הכל עובד בלעדיהם.
+
 ## ✦ למה זה מיוחד
 
 - 🌌 **רקע קוסמי חי** – שדה כוכבים, כוכבים נופלים, ערפיליות זוהרות, אורות צפוניים, פרחים נושרים, בועות, מנדלות חינה.
