@@ -4,6 +4,6 @@
 import React from 'react';
 import InvitationPreview from '../InvitationPreview.jsx';
 
-export default function Cosmic({ state }) {
-  return <InvitationPreview state={state} />;
+export default function Cosmic({ state, compact = false }) {
+  return <InvitationPreview state={state} compact={compact} />;
 }

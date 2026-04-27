@@ -3,7 +3,7 @@
 
 export const DEFAULT_STATE = {
   eventType: 'wedding',
-  style: 'cosmos',          // one of styles.js keys – decides the layout
+  style: 'classic',         // calm, fast first impression on mobile; users can switch in Design tab
   theme: 'cosmos',          // palette variant (only used inside cosmic style)
   fontPair: 'classicSerif',
   bride: 'דנה',

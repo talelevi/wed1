@@ -19,9 +19,9 @@ const REGISTRY = {
   watercolor: Watercolor,
 };
 
-export default function StyleRenderer({ state }) {
+export default function StyleRenderer({ state, compact = false }) {
   const Comp = REGISTRY[state.style] || REGISTRY.cosmos;
-  return <Comp state={state} />;
+  return <Comp state={state} compact={compact} />;
 }
 
 export { REGISTRY };

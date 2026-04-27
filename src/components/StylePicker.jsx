@@ -37,7 +37,8 @@ function StyleCard({ style, state, active, onSelect }) {
       }`}
       style={{ background: 'rgba(255,255,255,0.03)' }}
     >
-      {/* Live thumbnail — render the actual style at small scale */}
+      {/* Live thumbnail — render the actual style at small scale.
+          `compact` skips heavy hover handlers and outer padding. */}
       <div className="relative w-full aspect-[3/5] overflow-hidden pointer-events-none">
         <div
           style={{
@@ -47,7 +48,7 @@ function StyleCard({ style, state, active, onSelect }) {
             marginLeft: '-61%',
           }}
         >
-          {Comp && <Comp state={state} />}
+          {Comp && <Comp state={state} compact />}
         </div>
       </div>
 

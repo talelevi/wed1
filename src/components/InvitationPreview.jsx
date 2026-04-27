@@ -14,8 +14,9 @@ export default function InvitationPreview({ state, compact = false }) {
   const cardRef = useRef(null);
   const showHenna = state.showHennaPatterns || state.eventType === 'henna';
 
-  // 3D tilt on hover/touch
+  // 3D tilt on hover/touch — skip in compact (thumbnail) mode for perf.
   useEffect(() => {
+    if (compact) return;
     const el = cardRef.current;
     if (!el) return;
     const onMove = (e) => {

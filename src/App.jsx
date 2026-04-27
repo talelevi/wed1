@@ -58,9 +58,38 @@ export default function App() {
     return () => clearTimeout(h);
   }, [state]);
 
+  // Keep <title>, description and OG meta in sync with the current state so
+  // share previews on WhatsApp / Telegram show the couple's names.
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const couple =
+      state.eventType === 'birthday'
+        ? state.bride
+        : `${state.bride} & ${state.groom}`;
+    const desc =
+      state.tagline?.slice(0, 160) ||
+      'הזמנה לאירוע — לחצו לפתיחה ולהוספה ליומן.';
+    document.title = `${couple} — Luminara`;
+    setMeta('description', desc);
+    setMeta('og:title', `${couple} — הזמנה`, true);
+    setMeta('og:description', desc, true);
+    setMeta('twitter:title', `${couple} — הזמנה`);
+    setMeta('twitter:description', desc);
+    setMeta('twitter:card', 'summary');
+  }, [state]);
+
+  // Auto-switch to guest only when this looks like a fresh visitor opening
+  // a share link — not when the editor reloads their own URL (which always
+  // contains their own state in the hash).
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (readStateFromUrl()) setMode('guest');
+    const fromUrl = readStateFromUrl();
+    if (!fromUrl) return;
+    const stored = loadFromStorage();
+    const isFirstVisit = !stored;
+    const fromUrlIsDifferent =
+      stored && (stored.bride !== fromUrl.bride || stored.dateISO !== fromUrl.dateISO);
+    if (isFirstVisit || fromUrlIsDifferent) setMode('guest');
   }, []);
 
   useEffect(() => {
@@ -138,21 +167,21 @@ export default function App() {
       </AnimatePresence>
 
       {/* Header */}
-      <header className="sticky top-0 z-30 px-3 sm:px-6 py-2.5 flex items-center justify-between glass">
-        <div className="flex items-center gap-2 min-w-0">
+      <header className="sticky top-0 z-30 px-2 sm:px-6 py-2.5 flex items-center justify-between gap-2 glass">
+        <div className="flex items-center gap-2 min-w-0 shrink">
           <Logo />
-          <div className="leading-tight min-w-0">
-            <div className="font-display text-shimmer text-lg">Luminara</div>
+          <div className="leading-tight min-w-0 hidden min-[380px]:block">
+            <div className="font-display text-shimmer text-lg leading-none">Luminara</div>
             <div className="text-[10px] tracking-[0.25em] text-gold-50/60 truncate">
-              סטייל: {STYLES[state.style]?.labelHe || '—'}
+              {STYLES[state.style]?.labelHe || '—'}
             </div>
           </div>
         </div>
-        <nav className="flex gap-1.5 items-center">
+        <nav className="flex gap-1 items-center shrink-0">
           {canInstall && !installed && (
             <button
               onClick={promptInstall}
-              className="hidden sm:inline-flex text-[11px] tracking-widest rounded-lg px-2.5 py-1.5 border border-gold-300/60 text-gold-50 hover:bg-white/10"
+              className="hidden md:inline-flex text-[11px] tracking-widest rounded-lg px-2.5 py-1.5 border border-gold-300/60 text-gold-50 hover:bg-white/10"
             >
               ⤓ התקנה
             </button>
@@ -191,10 +220,10 @@ export default function App() {
         נבנה באהבה · קישור קבוע: <a className="underline decoration-dotted" dir="ltr" href={url}>{url.length > 60 ? url.slice(0, 60) + '…' : url}</a>
       </footer>
 
-      {/* Mobile floating preview button */}
+      {/* Mobile floating preview button — bottom-right for thumb reach in RTL */}
       <button
         onClick={() => setPreviewOpen(true)}
-        className="lg:hidden fixed bottom-4 left-4 z-30 btn btn-primary shadow-2xl"
+        className="lg:hidden fixed bottom-4 right-4 z-30 btn btn-primary shadow-2xl"
         aria-label="פתח תצוגה מקדימה"
       >
         👁 תצוגה
@@ -209,21 +238,23 @@ function Studio({ state, setState, tab, setTab, onReset, onRandomize, url }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_minmax(360px,1fr)] gap-5 px-3 sm:px-6 py-5 max-w-[1500px] mx-auto">
       <section className="space-y-4 min-w-0">
-        {/* Tabs */}
-        <div className="glass rounded-2xl p-1 flex flex-wrap gap-1 sticky top-[60px] z-20">
-          {TABS.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              className={`flex-1 min-w-[80px] rounded-xl px-3 py-2 text-sm transition ${
-                tab === t.id
-                  ? 'bg-white/10 text-gold-50 ring-1 ring-gold-300/40'
-                  : 'text-gold-50/70 hover:text-gold-50 hover:bg-white/[0.05]'
-              }`}
-            >
-              <span className="ml-1">{t.icon}</span> {t.label}
-            </button>
-          ))}
+        {/* Tabs — horizontal scroll on narrow phones; never wraps. */}
+        <div className="glass rounded-2xl p-1 sticky top-[60px] z-20 overflow-x-auto no-scrollbar">
+          <div className="flex gap-1 min-w-max">
+            {TABS.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setTab(t.id)}
+                className={`shrink-0 rounded-xl px-3 py-2 text-sm whitespace-nowrap transition ${
+                  tab === t.id
+                    ? 'bg-white/10 text-gold-50 ring-1 ring-gold-300/40'
+                    : 'text-gold-50/70 hover:text-gold-50 hover:bg-white/[0.05]'
+                }`}
+              >
+                <span className="ml-1">{t.icon}</span> {t.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {tab === 'design' && (
@@ -347,6 +378,18 @@ function SegBtn({ active, children, onClick }) {
       {children}
     </button>
   );
+}
+
+function setMeta(name, content, isProperty = false) {
+  if (typeof document === 'undefined') return;
+  const attr = isProperty ? 'property' : 'name';
+  let el = document.querySelector(`meta[${attr}="${name}"]`);
+  if (!el) {
+    el = document.createElement('meta');
+    el.setAttribute(attr, name);
+    document.head.appendChild(el);
+  }
+  el.setAttribute('content', content);
 }
 
 function Logo() {

@@ -65,12 +65,13 @@ export default function ShareBar({ state }) {
         <span className="text-[11px] text-gold-50/60">לחיצה אחת ושלחת</span>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+      {/* Buttons size down + truncate gracefully on phones */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 [&>*]:!px-2 [&>*]:!py-2 [&>*]:text-xs sm:[&>*]:text-sm [&>*]:min-w-0 [&>*]:truncate">
         <a className="btn btn-primary" href={googleCalendarUrl(ev)} target="_blank" rel="noreferrer">
-          📅 Google Calendar
+          📅 Google
         </a>
         <button className="btn btn-ghost" onClick={() => downloadICS(ev, `${state.bride}-${state.groom || 'event'}.ics`)}>
-          ⤓ הורדת ICS (Apple/Outlook)
+          ⤓ Apple / Outlook
         </button>
         <a className="btn btn-ghost" href={outlookCalendarUrl(ev)} target="_blank" rel="noreferrer">
           🪟 Outlook Web
@@ -84,15 +85,9 @@ export default function ShareBar({ state }) {
         <a className="btn btn-ghost" href={tgUrl} target="_blank" rel="noreferrer">
           ✈️ טלגרם
         </a>
-        <a className="btn btn-ghost" href={smsUrl}>
-          💬 SMS
-        </a>
-        <a className="btn btn-ghost" href={mailUrl}>
-          ✉️ אימייל
-        </a>
-        <button className="btn btn-ghost" onClick={onNativeShare}>
-          📤 שיתוף מערכת
-        </button>
+        <a className="btn btn-ghost" href={smsUrl}>💬 SMS</a>
+        <a className="btn btn-ghost" href={mailUrl}>✉️ אימייל</a>
+        <button className="btn btn-ghost" onClick={onNativeShare}>📤 שיתוף</button>
       </div>
 
       <div className="mt-4 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2 items-center">
