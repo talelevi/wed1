@@ -3,20 +3,23 @@
 
 export const DEFAULT_STATE = {
   eventType: 'wedding',
-  style: 'classic',         // calm, fast first impression on mobile; users can switch in Design tab
+  style: 'greenery',        // hand-drawn cream-and-sage default, matches the brief
   theme: 'cosmos',          // palette variant (only used inside cosmic style)
   fontPair: 'classicSerif',
-  bride: 'דנה',
-  groom: 'עומר',
-  parentsBride: 'משפחת לוי',
-  parentsGroom: 'משפחת כהן',
-  tagline: 'בליל אחד, מתחת לאותו ירח, חיינו נחשפים',
-  dateISO: nextSaturdayISO(),
+  bride: 'ענבל ויינודצקי',
+  groom: 'טל אלוי',
+  parentsBride: 'משפחת ויינודצקי',
+  parentsGroom: 'משפחת אלוי',
+  intro: 'אנו שמחים להזמינכם לחגוג עמנו את יום נישואינו',
+  closing: 'נשמח לראותכם!',
+  tagline: 'נשמח לראותכם חוגגים איתנו יום מלא באהבה ואושר',
+  dateISO: weddingDateISO(),
+  hebrewDateLabel: 'כ"ג באייר תשפ"ו',
   durationMinutes: 360,
-  receptionTime: '19:00',
-  ceremonyTime: '20:30',
-  venueName: 'גני האירועים אסטרליה',
-  venueAddress: 'מושב כנף 12, גליל עליון',
+  receptionTime: '19:30',
+  ceremonyTime: '19:30',
+  venueName: 'גן הפקאן',
+  venueAddress: '',
   venueMapsUrl: '',
   rsvpName: '',
   rsvpPhone: '',
@@ -39,6 +42,11 @@ function nextSaturdayISO() {
   d.setDate(d.getDate() + ((6 - d.getDay() + 7) % 7 || 7) + 21);
   d.setHours(20, 0, 0, 0);
   return d.toISOString();
+}
+
+function weddingDateISO() {
+  // 09/06/2026 19:30 local time (Israel)
+  return new Date(2026, 5, 9, 19, 30, 0, 0).toISOString();
 }
 
 const toUrlSafe = (b64) => b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');

@@ -7,8 +7,16 @@ import ArtDeco from './ArtDeco.jsx';
 import Minimalist from './Minimalist.jsx';
 import Mediterranean from './Mediterranean.jsx';
 import Watercolor from './Watercolor.jsx';
+import Greenery from './Greenery.jsx';
+import Wreath from './Wreath.jsx';
+import OliveMinimal from './OliveMinimal.jsx';
+import Wildflowers from './Wildflowers.jsx';
 
 const REGISTRY = {
+  greenery: Greenery,
+  wreath: Wreath,
+  olive: OliveMinimal,
+  wildflowers: Wildflowers,
   cosmos: Cosmic,
   classic: ClassicStatic,
   botanical: Botanical,

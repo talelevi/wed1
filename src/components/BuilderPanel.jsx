@@ -36,9 +36,19 @@ export default function BuilderPanel({ state, setState, onReset, onRandomize }) 
               <input className="field" value={state.parentsGroom} onChange={set('parentsGroom')} />
             </Field>
           )}
+          <Field label="פתיחה (מעל התאריך)" full>
+            <input className="field" maxLength={140}
+              value={state.intro || ''} onChange={set('intro')}
+              placeholder="אנו שמחים להזמינכם לחגוג עמנו את יום נישואינו" />
+          </Field>
           <Field label="ציטוט / שורת מחץ" full>
             <textarea className="field min-h-[60px]" maxLength={180}
               value={state.tagline} onChange={set('tagline')} />
+          </Field>
+          <Field label="חתימה (בתחתית, סטיילים מצוירים)" full>
+            <input className="field" maxLength={60}
+              value={state.closing || ''} onChange={set('closing')}
+              placeholder="נשמח לראותכם!" />
           </Field>
         </div>
       </Section>
@@ -66,6 +76,10 @@ export default function BuilderPanel({ state, setState, onReset, onRandomize }) 
                 setState((s) => ({ ...s, dateISO: new Date(e.target.value).toISOString() }))
               }
             />
+          </Field>
+          <Field label="תאריך עברי (לסטיילים מצוירים)" full>
+            <input className="field" value={state.hebrewDateLabel || ''}
+              onChange={set('hebrewDateLabel')} placeholder='למשל: כ"ג באייר תשפ"ו' />
           </Field>
           <Field label="קבלת פנים">
             <input className="field" value={state.receptionTime} onChange={set('receptionTime')} />
